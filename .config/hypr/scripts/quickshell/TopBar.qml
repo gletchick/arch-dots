@@ -14,14 +14,14 @@ Variants {
             id: barWindow
             property bool pendingReload: false
             
-	    Caching { id: paths }
+            Caching { id: paths }
 
-	    Component.onCompleted: {
- 	        console.log("runDir:", paths.runDir)
- 	        console.log("manual path:", paths.runDir + "/workspaces")
- 	        console.log("env test:", Quickshell.env("QS_RUN_WORKSPACES"))
- 	        console.log("wsPath:", paths.getRunDir("workspaces"))
-	    }	     	
+            Component.onCompleted: {
+                console.log("runDir:", paths.runDir)
+                console.log("manual path:", paths.runDir + "/workspaces")
+                console.log("env test:", Quickshell.env("QS_RUN_WORKSPACES"))
+                console.log("wsPath:", paths.getRunDir("workspaces"))
+            }	     	
         
             IpcHandler {
                 target: "topbar"
@@ -37,6 +37,37 @@ Variants {
                 }
                 function toggleUpdate() {
                     barWindow.forceUpdateShow = !barWindow.forceUpdateShow
+                }
+            }
+
+            Process {
+                id: vpnPoller
+                command: ["bash", "-c", "~/.config/hypr/scripts/quickshell/network/vpn_status.sh"]
+                stdout: StdioCollector {
+                    onStreamFinished: {
+                        let txt = this.text.trim();
+                        if (txt !== "") {
+                            try {
+                                let data = JSON.parse(txt);
+                                barWindow.isVpnOn = data.active;
+                                barWindow.vpnIcon = data.icon;
+                                barWindow.vpnName = data.text;
+                            } catch(e) {
+                                console.log("Error parsing VPN JSON: " + e);
+                            }
+                        }
+                    }
+                }
+            }
+
+            Timer {
+                interval: 3000
+                running: true
+                repeat: true
+                triggeredOnStart: true
+                onTriggered: {
+                    vpnPoller.running = false;
+                    vpnPoller.running = true;
                 }
             }
 
@@ -240,6 +271,10 @@ Variants {
             property string wifiStatus: "Off"
             property string wifiIcon: "󰤮"
             property string wifiSsid: ""
+
+            property bool isVpnOn: false
+            property string vpnIcon: "󰦞"
+            property string vpnName: "VPN Off"
             
             property string btStatus: "Off"
             property string btIcon: "󰂲"
@@ -1350,6 +1385,81 @@ Variants {
                             }
 
                             Rectangle {
+                                id: vpnPill
+                                property bool isHovered: vpnMouse.containsMouse
+                                radius: barWindow.s(10)
+                                height: sysLayout.pillHeight
+                                clip: true
+                                color: isHovered ? Qt.rgba(mocha.surface1.r, mocha.surface1.g, mocha.surface1.b, 0.6) : Qt.rgba(mocha.surface0.r, mocha.surface0.g, mocha.surface0.b, 0.4)
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: barWindow.s(10)
+                                    opacity: barWindow.isVpnOn ? 1.0 : 0.0
+                                    Behavior on opacity { NumberAnimation { duration: 300 } }
+                                    gradient: Gradient {
+                                        orientation: Gradient.Horizontal
+                                        GradientStop { position: 0.0; color: mocha.lavender }
+                                        GradientStop { position: 1.0; color: mocha.mauve }
+                                    }
+                                }
+
+                                property real targetWidth: vpnLayoutRow.implicitWidth + barWindow.s(24)
+                                width: targetWidth
+                                Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.OutQuint } }
+
+                                scale: isHovered ? 1.05 : 1.0
+                                Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutExpo } }
+                                Behavior on color { ColorAnimation { duration: 200 } }
+
+                                property bool initAnimTrigger: false
+                                Timer { running: rightContent.showLayout && !parent.initAnimTrigger; interval: 120; onTriggered: parent.initAnimTrigger = true }
+                                opacity: initAnimTrigger ? 1 : 0
+                                transform: Translate { y: parent.initAnimTrigger ? 0 : barWindow.s(15); Behavior on y { NumberAnimation { duration: 500; easing.type: Easing.OutBack } } }
+                                Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+
+                                Row {
+                                    id: vpnLayoutRow
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: barWindow.s(12)
+                                    spacing: barWindow.s(8)
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: barWindow.vpnIcon
+                                        font.family: "Iosevka Nerd Font"
+                                        font.pixelSize: barWindow.s(16)
+                                        color: barWindow.isVpnOn ? mocha.base : mocha.subtext0
+                                    }
+                                    Text {
+                                        id: vpnText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: barWindow.vpnName
+                                        visible: text !== ""
+                                        font.family: "JetBrains Mono"
+                                        font.pixelSize: barWindow.s(13)
+                                        font.weight: Font.Black
+                                        color: barWindow.isVpnOn ? mocha.base : mocha.text
+                                        width: Math.min(implicitWidth, barWindow.s(100))
+                                        elide: Text.ElideRight
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: vpnMouse
+                                    hoverEnabled: true
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (barWindow.isVpnOn) {
+                                            Quickshell.execDetached(["bash", "-c", "vpn-down"])
+                                        } else {
+                                            Quickshell.execDetached(["bash", "-c", "vpn-up"])
+                                        }
+                                    }
+                                }
+                            }
+
+                            Rectangle {
                                 id: btPill
                                 property bool isHovered: btMouse.containsMouse
                                 radius: barWindow.s(10); height: sysLayout.pillHeight
@@ -1569,6 +1679,6 @@ Variants {
                     }
                 }
             }
-        }
+        }  
     }
 }
