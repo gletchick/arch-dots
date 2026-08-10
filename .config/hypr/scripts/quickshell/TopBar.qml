@@ -42,7 +42,7 @@ Variants {
 
             Process {
                 id: vpnPoller
-                command: ["bash", "-c", "~/.config/hypr/scripts/quickshell/network/vpn_status.sh"]
+                command: ["bash", "-c", "~/.config/hypr/scripts/quickshell/network/vpn_panel_logic.sh"]
                 stdout: StdioCollector {
                     onStreamFinished: {
                         let txt = this.text.trim();
@@ -1399,8 +1399,8 @@ Variants {
                                     Behavior on opacity { NumberAnimation { duration: 300 } }
                                     gradient: Gradient {
                                         orientation: Gradient.Horizontal
-                                        GradientStop { position: 0.0; color: mocha.lavender }
-                                        GradientStop { position: 1.0; color: mocha.mauve }
+                                        GradientStop { position: 0.0; color: mocha.blue }
+                                        GradientStop { position: 1.0; color: Qt.lighter(mocha.blue, 1.3) }
                                     }
                                 }
 
@@ -1450,11 +1450,7 @@ Variants {
                                     hoverEnabled: true
                                     anchors.fill: parent
                                     onClicked: {
-                                        if (barWindow.isVpnOn) {
-                                            Quickshell.execDetached(["bash", "-c", "vpn-down"])
-                                        } else {
-                                            Quickshell.execDetached(["bash", "-c", "vpn-up"])
-                                        }
+                                        Quickshell.execDetached(["bash", "-c", "~/.config/hypr/scripts/quickshell/network/vpn_panel_logic.sh toggle"])
                                     }
                                 }
                             }
