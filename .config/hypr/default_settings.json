@@ -26,13 +26,15 @@
     {"type":"bind","mods":"$mainMod","key":"F","dispatcher":"exec","command":"firefox"},
     {"type":"bind","mods":"$mainMod","key":"E","dispatcher":"exec","command":"nautilus"},
     {"type":"bind","mods":"$mainMod","key":"R","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/reload.sh"},
+    {"type":"bind","mods":"$mainMod SHIFT_L","key":"C","dispatcher":"exec","command":"chromium"},
     {"type":"bind","mods":"$mainMod","key":"C","dispatcher":"exec","command":"~/.config/hypr/scripts/qs_manager.sh toggle clipboard"},
     {"type":"bind","mods":"$mainMod","key":"P","dispatcher":"exec","command":"~/.config/hypr/scripts/qs_manager.sh toggle movies"},
     {"type":"bind","mods":"$mainMod","key":"D","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle applauncher"},
     {"type":"bind","mods":"$mainMod SHIFT_L","key":"S","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle settings"},
     {"type":"bind","mods":"$mainMod","key":"Q","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle music"},
     {"type":"bind","mods":"$mainMod","key":"B","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle battery"},
-    {"type":"bind","mods":"$mainMod","key":"W","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle wallpaper"},
+    {"type":"bind","mods":"$mainMod","key":"W","dispatcher":"exec","command":"hyprctl dispatch killactive"},
+    {"type":"bind","mods":"$mainMod","key":"Y","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle wallpaper"},
     {"type":"bind","mods":"$mainMod","key":"S","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle calendar"},
     {"type":"bind","mods":"$mainMod","key":"N","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle network"},
     {"type":"bind","mods":"$mainMod SHIFT_L","key":"T","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle focustime"},
@@ -74,7 +76,8 @@
     {"type":"bind","mods":"$mainMod SHIFT","key":"8","dispatcher":"exec","command":"~/.config/hypr/scripts/qs_manager.sh 8 move"},
     {"type":"bind","mods":"$mainMod SHIFT","key":"9","dispatcher":"exec","command":"~/.config/hypr/scripts/qs_manager.sh 9 move"},
     {"type":"bind","mods":"$mainMod SHIFT","key":"0","dispatcher":"exec","command":"~/.config/hypr/scripts/qs_manager.sh 10 move"},
-    {"type":"bind","mods":"$mainMod","key":"TAB","dispatcher":"exec","command":"~/.config/hypr/scripts/focus_next_monitor.sh"}
+    {"type":"bind","mods":"$mainMod","key":"TAB","dispatcher":"exec","command":"~/.config/hypr/scripts/focus_next_monitor.sh"},
+    {"type":"bind","mods":"$mainMod","key":"T","dispatcher":"exec","command":"hyprctl dispatch togglespecialworkspace tg"}
   ],
   "startup": [
     {"command": "systemctl --user start hyprpolkitagent"},
