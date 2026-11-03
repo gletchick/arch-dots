@@ -1,0 +1,49 @@
+-- Appearance and input settings (migrated from settings.conf).
+-- Preserve original border colors (previously from colors.conf).
+local activeBorderColor = "rgba(f1b3e6ee)"
+local inactiveBorderColor = "rgba(663560aa)"
+-- Preserve Matugen-generated border colors without requiring Hyprland to parse a .conf file.
+local colorFile = io.open((os.getenv("HOME") or "") .. "/.config/hypr/colors.conf", "r")
+if colorFile then
+    for line in colorFile:lines() do
+        local name, value = line:match("^%s*%$(%w+)%s*=%s*(rgba?%([%x]+%))")
+        if name == "active_border" then activeBorderColor = value end
+        if name == "inactive_border" then inactiveBorderColor = value end
+    end
+    colorFile:close()
+end
+hl.config({
+    general = {
+        border_size = 2, gaps_in = 4, gaps_out = 4, float_gaps = 6,
+        resize_on_border = true, extend_border_grab_area = 30,
+        col = {
+            active_border = activeBorderColor,
+            inactive_border = inactiveBorderColor,
+        },
+    },
+    decoration = {
+        rounding = 4, active_opacity = 1.0, inactive_opacity = 1.0,
+        blur = { enabled = true, size = 8, passes = 2, new_optimizations = true },
+        shadow = { enabled = false },
+    },
+    input = {
+        kb_layout = "us,ru", kb_options = "grp:win_space_toggle",
+        touchpad = { natural_scroll = true },
+    },
+    cursor = { no_warps = true },
+    misc = {
+        font_family = "JetBrains Mono", disable_hyprland_logo = true,
+        disable_splash_rendering = true, force_default_wallpaper = 0,
+    },
+    ecosystem = { no_update_news = true, no_donation_nag = true },
+})
+-- Original bezier and timings exactly preserved.
+hl.curve("myBezier", { type = "bezier", points = { {0.05, 0.9}, {0.1, 1.05} } })
+for _, a in ipairs({
+    {"windows", "popin 80%"}, {"windowsOut", "popin 80%"},
+    {"layers", "fade"}, {"layersIn", "fade"}, {"layersOut", "fade"},
+    {"fade", nil}, {"workspaces", "slide"},
+    {"specialWorkspaceIn", "fade"}, {"specialWorkspaceOut", "fade"},
+}) do
+    hl.animation({ leaf = a[1], enabled = true, speed = 5, bezier = "myBezier", style = a[2] })
+end
