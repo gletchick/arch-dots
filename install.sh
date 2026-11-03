@@ -1563,13 +1563,13 @@ jq -n --slurpfile local "$OLD_JSON" --slurpfile up "$UPSTREAM_JSON" \
        end
    ) |
    # These window-management shortcuts are reserved in the current defaults.
-   # Drop legacy SUPER+W wallpaper mapping before applying the new SUPER+W / SUPER+Y.
+   # Replace legacy SUPER+W/Y/M/T mappings with the current behavior.
    .keybinds = (
        (.keybinds | map(select(
-           ((.mods // "") == "$mainMod" and ((.key // "" | ascii_upcase) == "W" or (.key // "" | ascii_upcase) == "Y")) | not
+           ((.mods // "") == "$mainMod" and ((.key // "" | ascii_upcase) | IN("W", "Y", "M", "T"))) | not
        ))) +
        ($u.keybinds | map(select(
-           (.mods // "") == "$mainMod" and ((.key // "" | ascii_upcase) == "W" or (.key // "" | ascii_upcase) == "Y")
+           (.mods // "") == "$mainMod" and ((.key // "" | ascii_upcase) | IN("W", "Y", "M", "T"))
        )))
    )
 ' > "$SETTINGS_FILE"

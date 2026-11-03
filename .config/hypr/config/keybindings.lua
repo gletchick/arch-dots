@@ -74,4 +74,5 @@ hl.bind("SUPER + SHIFT + 9", hl.dsp.exec_cmd("~/.config/hypr/scripts/qs_manager.
 hl.bind("SUPER + SHIFT + 0", hl.dsp.exec_cmd("~/.config/hypr/scripts/qs_manager.sh 10 move"))
 hl.bind("SUPER + TAB", hl.dsp.exec_cmd("~/.config/hypr/scripts/focus_next_monitor.sh"))
 hl.bind("SUPER + SHIFT + C", hl.dsp.exec_cmd("chromium"))
-hl.bind("SUPER + T", hl.dsp.workspace.toggle_special("tg"))
+hl.bind("SUPER + M", hl.dsp.window.fullscreen({ action = "toggle", mode = "fullscreen" }))
+hl.bind("SUPER + T", hl.dsp.exec_cmd("bash ~/.config/hypr/scripts/toggle_tg.sh"))

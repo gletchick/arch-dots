@@ -494,9 +494,16 @@
     {
       "type": "bind",
       "mods": "$mainMod",
+      "key": "M",
+      "dispatcher": "fullscreen",
+      "command": "0"
+    },
+    {
+      "type": "bind",
+      "mods": "$mainMod",
       "key": "T",
       "dispatcher": "exec",
-      "command": "hyprctl dispatch togglespecialworkspace tg"
+      "command": "bash ~/.config/hypr/scripts/toggle_tg.sh"
     }
   ],
   "startup": [
