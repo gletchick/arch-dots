@@ -2565,7 +2565,7 @@ Item {
                                                 if (event.modifiers & Qt.MetaModifier) newMods.push("$mainMod");
                                                 if (event.modifiers & Qt.ControlModifier) newMods.push("CTRL");
                                                 if (event.modifiers & Qt.AltModifier) newMods.push("ALT");
-                                                if (event.modifiers & Qt.ShiftModifier) newMods.push("SHIFT_L");
+                                                if (event.modifiers & Qt.ShiftModifier) newMods.push("SHIFT");
                                                 let isModifierOnly = (event.key === Qt.Key_Super_L || event.key === Qt.Key_Super_R ||
                                                                       event.key === Qt.Key_Meta || event.key === Qt.Key_Control ||
                                                                       event.key === Qt.Key_Alt || event.key === Qt.Key_Shift ||

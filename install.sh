@@ -692,7 +692,7 @@ show_overview() {
     print_kb "SUPER + M" "Toggle Monitors"
     print_kb "SUPER + Q" "Toggle Music"
     print_kb "SUPER + B" "Toggle Battery"
-    print_kb "SUPER + W" "Toggle Wallpaper"
+    print_kb "SUPER + Y" "Toggle Wallpaper"
     print_kb "SUPER + S" "Toggle Calendar"
     print_kb "SUPER + N" "Toggle Network"
     print_kb "SUPER + SHIFT + T" "Toggle FocusTime"
@@ -701,7 +701,9 @@ show_overview() {
 
     echo -e "${BOLD}${C_BLUE}--- Window Management ---${RESET}"
     print_kb "ALT + F4" "Close Active Window / Widget"
+    print_kb "SUPER + W" "Close Active Window"
     print_kb "SUPER + SHIFT + F" "Toggle Floating"
+    print_kb "SUPER + SHIFT + Arr" "Resize Active Window"
     print_kb "SUPER + Arrows" "Move Focus"
     print_kb "SUPER + CTRL + Arr" "Move Window"
     echo ""
@@ -1559,6 +1561,16 @@ jq -n --slurpfile local "$OLD_JSON" --slurpfile up "$UPSTREAM_JSON" \
            ($u.startup | map(select(.command as $cmd | ($local_startups | index($cmd)) == null))) as $new_startups |
            ($l.startup + $new_startups)
        end
+   ) |
+   # These window-management shortcuts are reserved in the current defaults.
+   # Drop legacy SUPER+W wallpaper mapping before applying the new SUPER+W / SUPER+Y.
+   .keybinds = (
+       (.keybinds | map(select(
+           ((.mods // "") == "$mainMod" and ((.key // "" | ascii_upcase) == "W" or (.key // "" | ascii_upcase) == "Y")) | not
+       ))) +
+       ($u.keybinds | map(select(
+           (.mods // "") == "$mainMod" and ((.key // "" | ascii_upcase) == "W" or (.key // "" | ascii_upcase) == "Y")
+       )))
    )
 ' > "$SETTINGS_FILE"
 

@@ -99,7 +99,9 @@ def normalize_modifiers(mods, key):
     )
 
     parts = [
-        part.strip()
+        # SHIFT_L / SHIFT_R are keysyms, not modifier names.
+        # Normalise legacy settings produced by the UI.
+        "SHIFT" if part.upper() in ("SHIFT_L", "SHIFT_R") else part
         for part in re.split(r"[\s&+]+", mods)
         if part.strip()
     ]
