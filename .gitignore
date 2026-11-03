@@ -9,3 +9,19 @@
 .idea
 commit.txt
 .vscode
+
+# Local settings
+.config/hypr/settings.json
+.config/hypr/scripts/quickshell/calendar/.env
+.config/hypr/scripts/quickshell/qs_colors.json
+
+# Backups
+*.bak
+*.save
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Migration artifacts
+.config/hypr/hyprland.conf
