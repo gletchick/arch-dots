@@ -6,7 +6,7 @@ local inactiveBorderColor = "rgba(663560aa)"
 local colorFile = io.open((os.getenv("HOME") or "") .. "/.config/hypr/colors.conf", "r")
 if colorFile then
     for line in colorFile:lines() do
-        local name, value = line:match("^%s*%$(%w+)%s*=%s*(rgba?%([%x]+%))")
+        local name, value = line:match("^%s*%$([%w_]+)%s*=%s*(rgba?%([%x]+%))")
         if name == "active_border" then activeBorderColor = value end
         if name == "inactive_border" then inactiveBorderColor = value end
     end

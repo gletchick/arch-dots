@@ -4,7 +4,7 @@
 # 1. Flatten Matugen v4.0 Nested JSON for Quickshell
 # ------------------------------------------------------------------------------
 # Updated to match your config.toml output path
-QS_JSON="~/.config/hypr/scripts/quickshell/qs_colors.json"
+QS_JSON="$HOME/.config/hypr/scripts/quickshell/qs_colors.json"
 
 python3 -c '
 import json
@@ -100,3 +100,8 @@ if command -v gsettings &> /dev/null; then
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 fi
 
+
+# Apply the newly generated border colors from colors.conf via settings.lua.
+if command -v hyprctl >/dev/null 2>&1; then
+    hyprctl reload
+fi
