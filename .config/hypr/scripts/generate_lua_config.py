@@ -361,6 +361,12 @@ def emit_autostart(settings):
         "blueman-applet",
     ])
 
+    # This is a required part of the desktop session, not a user-configurable
+    # startup application. Keep it even when settings.json is regenerated.
+    restore_command = "~/.config/hypr/scripts/restore_session.sh"
+    commands = [command for command in commands if command != restore_command]
+    commands.append(restore_command)
+
     lines = [
         "-- Generated from settings.json.",
         'hl.on("hyprland.start", function()',

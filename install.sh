@@ -160,7 +160,7 @@ ARCH_PKGS=(
     "cliphist" "jq" "socat" "inotify-tools" "pamixer" "brightnessctl" "acpi" "iw"
     "bluez" "bluez-utils" "libnotify" "networkmanager" "lm_sensors" "bc" 
     "pipewire" "wireplumber" "pipewire-pulse" "pipewire-alsa" "pipewire-jack" "libpulse" "python"
-    "imagemagick" "wget" "file" "git" "psmisc"
+    "imagemagick" "wget" "file" "git" "psmisc" "base-devel" "rust"
     "matugen-bin" "ffmpeg" "fastfetch" "quickshell-git" "unzip" "python-websockets" "qt6-websockets"
     "grim" "playerctl" "satty" "yq" "xdg-desktop-portal-gtk" "slurp" "mpvpaper"
     "wmctrl" "power-profiles-daemon" "easyeffects" "swayosd-git" "nautilus" "lsp-plugins" "hyprpolkitagent"
@@ -1482,6 +1482,51 @@ else
     fi
     
 fi
+
+# --- 4.4 Build and deploy Hyprland Session Reloader ---
+echo -e "\n${C_CYAN}[ INFO ]${RESET} Building and installing Hyprland Session Reloader..."
+RELOADER_DIR="$REPO_DIR/tools/hypr-reloader"
+RELOADER_SERVICE="$REPO_DIR/systemd/user/hypr-reloader.service"
+
+if [ ! -f "$RELOADER_DIR/Cargo.toml" ] || [ ! -f "$RELOADER_SERVICE" ]; then
+    echo -e "${C_RED}[ FAILED ] Reloader sources or service unit are missing.${RESET}"
+    exit 1
+fi
+if ! command -v cargo >/dev/null 2>&1; then
+    echo -e "${C_RED}[ FAILED ] Cargo is unavailable. Install the rust package.${RESET}"
+    exit 1
+fi
+
+# Always rebuild from repository sources, including on partial updates.
+# Preserve the previously installed executable if compilation fails.
+if ! (cd "$RELOADER_DIR" && cargo build --release --locked); then
+    echo -e "${C_RED}[ FAILED ] Could not build hypr_reloader; existing installation was not replaced.${RESET}"
+    exit 1
+fi
+
+mkdir -p "$HOME/.local/bin" "$HOME/.config/systemd/user"
+# Stop an active process before replacing its executable.
+RELOADER_WAS_ACTIVE=false
+if systemctl --user is-active --quiet hypr-reloader.service; then
+    RELOADER_WAS_ACTIVE=true
+    systemctl --user stop hypr-reloader.service || true
+fi
+install -m 755 "$RELOADER_DIR/target/release/hypr_reloader" "$HOME/.local/bin/hypr_reloader"
+install -m 644 "$RELOADER_SERVICE" "$HOME/.config/systemd/user/hypr-reloader.service"
+systemctl --user daemon-reload
+
+# The restore_session.sh autostart script imports the Hyprland environment,
+# restores the saved windows and starts the daemon on every new session.
+# When updating inside an active Hyprland session, restart the daemon now.
+if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+    systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+    if ! systemctl --user start hypr-reloader.service; then
+        echo -e "${C_YELLOW}[ WARNING ] Reloader daemon could not start in this session; it will be retried on the next login.${RESET}"
+    fi
+elif [ "$RELOADER_WAS_ACTIVE" = true ]; then
+    echo -e "${C_YELLOW}[ WARNING ] Reloader was running but Hyprland environment is unavailable; start it on the next Hyprland login.${RESET}"
+fi
+printf "  -> Hyprland Session Reloader installed %-9s ${C_GREEN}[ OK ]${RESET}\n" ""
 
 # --- 4.5 Bake Hardware Variables into Template ---
 # By doing this now, we eliminate the need for the hacky hardware_env.conf file
