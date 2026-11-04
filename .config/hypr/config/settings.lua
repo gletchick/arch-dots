@@ -22,8 +22,8 @@ hl.config({
         },
     },
     decoration = {
-        rounding = 4, active_opacity = 1.0, inactive_opacity = 1.0,
-        blur = { enabled = true, size = 8, passes = 2, new_optimizations = true },
+        rounding = 2, active_opacity = 1.0, inactive_opacity = 1.0,
+        blur = { enabled = true, size = 3, passes = 1, new_optimizations = true },
         shadow = { enabled = false },
     },
     input = {
