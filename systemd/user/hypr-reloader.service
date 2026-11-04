@@ -1,0 +1,9 @@
+[Unit]
+Description=Hyprland Session Reloader
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/hypr_reloader daemon
+Restart=on-failure
+RestartSec=2s

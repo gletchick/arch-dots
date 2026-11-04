@@ -25,3 +25,6 @@ __pycache__/
 
 # Migration artifacts
 .config/hypr/hyprland.conf
+
+/tools/hypr-reloader/target/
+/tools/hypr-reloader/.idea/
