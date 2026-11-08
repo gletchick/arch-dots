@@ -22,12 +22,12 @@ hl.config({
         },
     },
     decoration = {
-        rounding = 2, active_opacity = 1.0, inactive_opacity = 1.0,
-        blur = { enabled = true, size = 3, passes = 1, new_optimizations = true },
+        rounding = 4, active_opacity = 1.0, inactive_opacity = 1.0,
+        blur = { enabled = true, size = 8, passes = 2, new_optimizations = true },
         shadow = { enabled = false },
     },
     input = {
-        kb_layout = "us,ru", kb_options = "grp:win_space_toggle",
+        kb_layout = "us", kb_options = "grp:alt_shift_toggle",
         touchpad = { natural_scroll = true },
     },
     cursor = { no_warps = true },

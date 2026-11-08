@@ -56,9 +56,8 @@ MANIFEST="$THUMB_DIR/.manifest"
 # Only runs on slow path — not on every workspace switch
 # -----------------------------------------------------------------------------
 
-if ! pgrep -f "quickshell.*Shell.qml" >/dev/null; then
-    quickshell -p "$SHELL_QML_PATH" >/dev/null 2>&1 &
-    disown
+if [[ -z "$(qs_pids)" ]]; then
+    qs_start
 fi
 
 # -----------------------------------------------------------------------------
@@ -197,3 +196,74 @@ if [[ "$ACTION" == "open" || "$ACTION" == "toggle" ]]; then
     fi
     exit 0
 fi
+
+# -----------------------------------------------------------------------------
+# QUICKSHELL PROCESS MANAGEMENT
+# -----------------------------------------------------------------------------
+
+qs_pids() {
+    local pid cmdline
+
+    while IFS= read -r pid; do
+        [[ -r "/proc/$pid/cmdline" ]] || continue
+
+        cmdline=$(tr '\0' ' ' < "/proc/$pid/cmdline")
+
+        if [[ "$cmdline" == "quickshell -p $SHELL_QML_PATH"* ]] ||
+           [[ "$cmdline" == "qs -p $SHELL_QML_PATH"* ]]; then
+            printf '%s\n' "$pid"
+        fi
+    done < <(pgrep -x quickshell || true)
+}
+
+qs_start() {
+    if [[ -n "$(qs_pids)" ]]; then
+        echo "Quickshell is already running."
+        return 0
+    fi
+
+    nohup quickshell -p "$SHELL_QML_PATH" \
+        > /dev/null 2>&1 < /dev/null &
+
+    echo "Quickshell started (PID $!)."
+}
+
+qs_stop() {
+    local pids
+
+    pids=$(qs_pids)
+
+    if [[ -z "$pids" ]]; then
+        echo "Quickshell is not running."
+        return 0
+    fi
+
+    while IFS= read -r pid; do
+        kill "$pid" 2>/dev/null || true
+    done <<< "$pids"
+
+    # Wait for the existing process to terminate.
+    for ((i = 0; i < 50; i++)); do
+        [[ -z "$(qs_pids)" ]] && return 0
+        sleep 0.1
+    done
+
+    echo "Quickshell did not stop cleanly." >&2
+    return 1
+}
+
+case "$ACTION" in
+    start)
+        qs_start
+        exit $?
+        ;;
+    stop)
+        qs_stop
+        exit $?
+        ;;
+    restart)
+        qs_stop || exit 1
+        qs_start
+        exit $?
+        ;;
+esac
