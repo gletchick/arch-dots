@@ -27,7 +27,7 @@ hl.config({
         shadow = { enabled = false },
     },
     input = {
-        kb_layout = "us", kb_options = "grp:alt_shift_toggle",
+        kb_layout = "us,ru", kb_options = "grp:win_space_toggle",
         touchpad = { natural_scroll = true },
     },
     cursor = { no_warps = true },
