@@ -160,7 +160,7 @@ ARCH_PKGS=(
     "cliphist" "jq" "socat" "inotify-tools" "pamixer" "brightnessctl" "acpi" "iw"
     "bluez" "bluez-utils" "libnotify" "networkmanager" "lm_sensors" "bc" 
     "pipewire" "wireplumber" "pipewire-pulse" "pipewire-alsa" "pipewire-jack" "libpulse" "python"
-    "imagemagick" "wget" "file" "git" "psmisc" "base-devel" "rust"
+    "imagemagick" "wget" "file" "git" "github-cli" "psmisc" "base-devel" "rust"
     "matugen-bin" "ffmpeg" "fastfetch" "quickshell-git" "unzip" "python-websockets" "qt6-websockets"
     "grim" "playerctl" "satty" "yq" "xdg-desktop-portal-gtk" "slurp" "mpvpaper"
     "wmctrl" "power-profiles-daemon" "easyeffects" "swayosd-git" "nautilus" "lsp-plugins" "hyprpolkitagent"
@@ -1900,6 +1900,18 @@ else
     # Fallback to the target directory just in case
     chmod +x "$TARGET_CONFIG_DIR/hypr/scripts/settings_watcher.sh"
     bash "$TARGET_CONFIG_DIR/hypr/scripts/settings_watcher.sh" --compile
+fi
+
+# --- Optional private Music Sync app (authorized GitHub accounts only) ---
+echo -e "\n${C_CYAN}[ INFO ]${RESET} Checking private Music Sync availability..."
+MUSIC_SYNC_INSTALLER="$REPO_DIR/scripts/install_music_sync.sh"
+if [[ -f "$MUSIC_SYNC_INSTALLER" ]]; then
+    # Run as the current user, not via sudo: gh credentials are per-user.
+    if ! bash "$MUSIC_SYNC_INSTALLER"; then
+        echo -e "${C_YELLOW}  -> Music Sync install failed; dotfiles installation will continue.${RESET}"
+    fi
+else
+    echo -e "${C_YELLOW}  -> Music Sync installer not found; skipping.${RESET}"
 fi
 
 # --- 8. Finalize Version Marker & User State Persistence ---
